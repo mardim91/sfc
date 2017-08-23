@@ -45,12 +45,10 @@ def main():
         #installer_pwd=COMMON_CONFIG.installer_password)
      
     cluster = COMMON_CONFIG.installer_cluster
-    cluster = None
+    
     openstack_nodes = (deploymentHandler.get_nodes({'cluster': cluster})
                        if cluster is not None
                        else deploymentHandler.get_nodes())
-    #for pame in openstack_nodes:
-    #    print pame.__dict__
 
     controller_nodes = [node for node in openstack_nodes
                         if node.is_controller()]

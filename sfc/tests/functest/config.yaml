@@ -12,12 +12,9 @@ defaults:
         user: root
         password: r00tme
         cluster: 1 # Change this to the id of the desired fuel env (1, 2, 3...)
-        pkey_file: None
       apex:
         ip: 192.168.122.94
         user: stack
-        password: None
-        cluster: None
         pkey_file: "/root/.ssh/id_rsa"
   image_format: qcow2
   url: "http://artifacts.opnfv.org/sfc/images"

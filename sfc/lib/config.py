@@ -12,6 +12,7 @@ import os
 import yaml
 import sys
 
+import sfc.lib.utils as test_utils
 from functest.utils.constants import CONST
 import logging
 import functest.utils.functest_utils as ft_utils
@@ -38,32 +39,34 @@ class CommonConfig(object):
         self.functest_results_dir = os.path.join(
             CONST.dir_results, "odl-sfc")
         self.config_file = os.path.join(self.sfc_test_dir,  "config.yaml")
-        self.installer_type = self.get_installer_type()
-        self.fill_installer_dict(self.installer_type)
-        #self.installer_type = ft_utils.get_parameter_from_yaml(
-        #    "defaults.installer.type", self.config_file)
+
+        self.installer_type = ft_utils.get_installer_type()
+
+        self.installer_fields = test_utils.fill_installer_dict(self.installer_type)
+
         self.installer_ip = ft_utils.get_parameter_from_yaml(
             self.installer_fields['ip'], self.config_file)
+
         self.installer_user = ft_utils.get_parameter_from_yaml(
             self.installer_fields['user'], self.config_file)
-
-        #try:
-        self.installer_password = ft_utils.get_parameter_from_yaml(
+        
+        try:
+            self.installer_password = ft_utils.get_parameter_from_yaml(
                 self.installer_fields['password'], self.config_file)
-        #except:
-        #    self.installer_password = None
+        except:
+            self.installer_password = None
 
-        #try:
-        self.installer_key_file = ft_utils.get_parameter_from_yaml(
+        try:
+            self.installer_key_file = ft_utils.get_parameter_from_yaml(
                 self.installer_fields['pkey_file'], self.config_file)
-        #except:
-        #    self.installer_key_file = None
+        except:
+            self.installer_key_file = None
 
-        #try:
-        self.installer_cluster = ft_utils.get_parameter_from_yaml(
+        try:
+            self.installer_cluster = ft_utils.get_parameter_from_yaml(
                 self.installer_fields['cluster'], self.config_file)
-        #except:
-        #    self.installer_cluster = None
+        except:
+            self.installer_cluster = None
 
         self.flavor = ft_utils.get_parameter_from_yaml(
             "defaults.flavor", self.config_file)
@@ -86,22 +89,7 @@ class CommonConfig(object):
         self.image_path = os.path.join(
             self.dir_functest_data, self.image_file_name)
 
-    def get_installer_type(self):
-        return os.environ['INSTALLER_TYPE'].lower()
 
-    def fill_installer_dict(self,installer_type): 
-        default_string = "defaults.installer.{}.".format(installer_type)
- 
-        self.installer_fields = {
-                             "ip": default_string+"ip",
-                             "user": default_string+"user",
-                             "password": default_string+"password",
-                             "cluster": default_string+"cluster",
-                             "pkey_file": default_string+"pkey_file"
-                           }
-        print self.installer_fields  
-                             
-  
 
 class TestcaseConfig(object):
     """
