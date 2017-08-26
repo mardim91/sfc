@@ -11,6 +11,8 @@
 import os
 import yaml
 import sys
+import sfc
+import functest
 
 import sfc.lib.utils as test_utils
 from functest.utils.constants import CONST
@@ -30,9 +32,11 @@ class CommonConfig(object):
         self.line_length = 30
         self.test_db = ft_utils.get_functest_config("results.test_db_url")
         #self.repo_path = CONST.dir_repo_sfc
-        self.repo_path = sys.path[6]
+        self.functest_repo_path = os.path.dirname(functest.__file__)
+        self.functest_logging_api = os.path.join(self.functest_repo_path,"ci","logging.ini" )
+        self.sfc_repo_path = os.path.dirname(sfc.__file__)
         self.sfc_test_dir = os.path.join(
-            self.repo_path, "sfc", "tests", "functest")
+            self.sfc_repo_path,"tests", "functest")
         self.vnfd_dir = os.path.join(self.sfc_test_dir, "vnfd-templates")
         self.vnfd_default_params_file = os.path.join(
             self.sfc_test_dir, "vnfd-default-params-file")

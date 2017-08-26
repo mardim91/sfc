@@ -11,8 +11,9 @@
 import os
 import sys
 import threading
-
 import logging
+
+from logging import config as logging_config
 from functest.utils.constants import CONST
 import functest.utils.openstack_tacker as os_tacker
 import functest.utils.openstack_utils as os_utils
@@ -55,7 +56,7 @@ def main():
     compute_nodes = [node for node in openstack_nodes
                      if node.is_compute()]
  
-    #odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes)
+    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes)
 
     for compute in compute_nodes:
         logger.info("This is a compute: %s" % compute.info)
@@ -66,8 +67,8 @@ def main():
     results.add_to_summary(2, "STATUS", "SUBTEST")
     results.add_to_summary(0, "=")
 
-    #test_utils.setup_compute_node(TESTCASE_CONFIG.subnet_cidr, compute_nodes)
-    #test_utils.configure_iptables(controller_nodes)
+    test_utils.setup_compute_node(TESTCASE_CONFIG.subnet_cidr, compute_nodes)
+    test_utils.configure_iptables(controller_nodes)
 
     test_utils.download_image(COMMON_CONFIG.url,
                               COMMON_CONFIG.image_path)
@@ -279,6 +280,5 @@ def main():
 
 
 if __name__ == '__main__':
-    #logging.config.fileConfig(
-    #    CONST.__getattribute__('dir_functest_logging_cfg'))
+    logging_config.fileConfig(COMMON_CONFIG.functest_logging_api)
     main()
