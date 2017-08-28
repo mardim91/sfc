@@ -44,6 +44,7 @@ def main():
         COMMON_CONFIG.installer_key_file)
      
     cluster = COMMON_CONFIG.installer_cluster
+    
     openstack_nodes = (deploymentHandler.get_nodes({'cluster': cluster})
                        if cluster is not None
                        else deploymentHandler.get_nodes())
