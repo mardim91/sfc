@@ -655,7 +655,6 @@ def delete_classifier_and_acl(tacker_client, clf_name, odl_ip, odl_port):
 def fill_installer_dict(installer_type): 
         default_string = "defaults.installer.{}.".format(installer_type) 
         installer_yaml_fields = {
-                             "ip": default_string+"ip",
                              "user": default_string+"user",
                              "password": default_string+"password",
                              "cluster": default_string+"cluster",

@@ -31,7 +31,6 @@ class CommonConfig(object):
     def __init__(self):
         self.line_length = 30
         self.test_db = ft_utils.get_functest_config("results.test_db_url")
-        #self.repo_path = CONST.dir_repo_sfc
         self.functest_repo_path = os.path.dirname(functest.__file__)
         self.functest_logging_api = os.path.join(self.functest_repo_path,"ci","logging.ini" )
         self.sfc_repo_path = os.path.dirname(sfc.__file__)
@@ -48,8 +47,7 @@ class CommonConfig(object):
 
         self.installer_fields = test_utils.fill_installer_dict(self.installer_type)
 
-        self.installer_ip = ft_utils.get_parameter_from_yaml(
-            self.installer_fields['ip'], self.config_file)
+        self.installer_ip = CONST.__getattribute__('INSTALLER_IP')
 
         self.installer_user = ft_utils.get_parameter_from_yaml(
             self.installer_fields['user'], self.config_file)
