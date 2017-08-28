@@ -7,7 +7,6 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-
 import os
 import sys
 import threading
@@ -45,7 +44,6 @@ def main():
         COMMON_CONFIG.installer_key_file)
      
     cluster = COMMON_CONFIG.installer_cluster
-    
     openstack_nodes = (deploymentHandler.get_nodes({'cluster': cluster})
                        if cluster is not None
                        else deploymentHandler.get_nodes())
@@ -59,7 +57,6 @@ def main():
 
     for compute in compute_nodes:
         logger.info("This is a compute: %s" % compute.info)
-        print compute.roles
 
     results = Results(COMMON_CONFIG.line_length)
     results.add_to_summary(0, "=")
@@ -98,7 +95,7 @@ def main():
                                             COMMON_CONFIG.image_path,
                                             COMMON_CONFIG.image_format,
                                             public='public')
-
+    
     network_id = test_utils.setup_neutron(neutron_client,
                                           TESTCASE_CONFIG.net_name,
                                           TESTCASE_CONFIG.subnet_name,

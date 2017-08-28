@@ -43,7 +43,7 @@ class CommonConfig(object):
             CONST.dir_results, "odl-sfc")
         self.config_file = os.path.join(self.sfc_test_dir,  "config.yaml")
 
-        self.installer_type = ft_utils.get_installer_type()
+        self.installer_type = CONST.__getattribute__('INSTALLER_TYPE')
 
         self.installer_fields = test_utils.fill_installer_dict(self.installer_type)
 
