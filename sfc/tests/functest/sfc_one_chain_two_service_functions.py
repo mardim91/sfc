@@ -54,10 +54,10 @@ def main():
     compute_nodes = [node for node in openstack_nodes
                      if node.is_compute()]
  
-    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes)
+    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes,COMMON_CONFIG.installer_type)
 
     for compute in compute_nodes:
-        logger.info("This is a compute: %s" % compute.info)
+        logger.info("This is a compute: %s" % compute.ip)
 
     results = Results(COMMON_CONFIG.line_length)
     results.add_to_summary(0, "=")

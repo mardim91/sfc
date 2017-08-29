@@ -51,7 +51,7 @@ def main():
     controller_nodes = [node for node in all_nodes if node.is_controller()]
     compute_nodes = [node for node in all_nodes if node.is_compute()]
 
-    odl_ip, odl_port = test_utils.get_odl_ip_port(all_nodes)
+    odl_ip, odl_port = test_utils.get_odl_ip_port(all_nodes,COMMON_CONFIG.installer_type)
 
     results = Results(COMMON_CONFIG.line_length)
     results.add_to_summary(0, "=")
