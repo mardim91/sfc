@@ -26,7 +26,6 @@ from sfc.lib.results import Results
 import sfc.lib.topology_shuffler as topo_shuffler
 
 
-from functest.utils.constants import CONST
 logger = logging.getLogger(__name__)
 
 CLIENT = "client"
@@ -41,7 +40,7 @@ def main():
         COMMON_CONFIG.installer_ip,
         COMMON_CONFIG.installer_user,
         COMMON_CONFIG.installer_password,
-        COMMON_CONFIG.installer_key_file) 
+        COMMON_CONFIG.installer_key_file)
 
     cluster = COMMON_CONFIG.installer_cluster
     all_nodes = (deploymentHandler.get_nodes({'cluster': cluster})
@@ -51,7 +50,8 @@ def main():
     controller_nodes = [node for node in all_nodes if node.is_controller()]
     compute_nodes = [node for node in all_nodes if node.is_compute()]
 
-    odl_ip, odl_port = test_utils.get_odl_ip_port(all_nodes,COMMON_CONFIG.installer_type)
+    odl_ip, odl_port = test_utils.get_odl_ip_port(
+        all_nodes, COMMON_CONFIG.installer_type)
 
     results = Results(COMMON_CONFIG.line_length)
     results.add_to_summary(0, "=")

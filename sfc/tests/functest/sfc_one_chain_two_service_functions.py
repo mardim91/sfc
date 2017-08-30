@@ -13,7 +13,6 @@ import threading
 import logging
 
 from logging import config as logging_config
-from functest.utils.constants import CONST
 import functest.utils.openstack_tacker as os_tacker
 import functest.utils.openstack_utils as os_utils
 import opnfv.utils.ovs_logger as ovs_log
@@ -42,9 +41,9 @@ def main():
         COMMON_CONFIG.installer_user,
         COMMON_CONFIG.installer_password,
         COMMON_CONFIG.installer_key_file)
-     
+
     cluster = COMMON_CONFIG.installer_cluster
-    
+
     openstack_nodes = (deploymentHandler.get_nodes({'cluster': cluster})
                        if cluster is not None
                        else deploymentHandler.get_nodes())
@@ -53,8 +52,9 @@ def main():
                         if node.is_controller()]
     compute_nodes = [node for node in openstack_nodes
                      if node.is_compute()]
- 
-    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes,COMMON_CONFIG.installer_type)
+
+    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes,
+                                                  COMMON_CONFIG.installer_type)
 
     for compute in compute_nodes:
         logger.info("This is a compute: %s" % compute.ip)
@@ -96,7 +96,7 @@ def main():
                                             COMMON_CONFIG.image_path,
                                             COMMON_CONFIG.image_format,
                                             public='public')
-    
+
     network_id = test_utils.setup_neutron(neutron_client,
                                           TESTCASE_CONFIG.net_name,
                                           TESTCASE_CONFIG.subnet_name,

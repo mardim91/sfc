@@ -15,7 +15,7 @@ import requests
 import time
 import xmltodict
 import yaml
-import re
+
 
 import logging
 import functest.utils.functest_utils as ft_utils
@@ -559,16 +559,21 @@ def get_nova_id(tacker_client, resource, vnf_id=None, vnf_name=None):
         return None
 
 
-def get_odl_ip_port(nodes,installer_type):
+def get_odl_ip_port(nodes, installer_type):
     if installer_type == 'apex':
+        remote_ml2_conf_etc = '/etc/neutron/plugins/ml2/ml2_conf.ini'
+        remote_ml2_conf_home = '/home/heat-admin/ml2_conf.ini'
         local_ml2_conf_file = os.path.join(os.getcwd(), 'ml2_conf.ini')
         controller_node = next(n for n in nodes if n.is_controller())
-        controller_node.run_cmd('sudo cp /etc/neutron/plugins/ml2/ml2_conf.ini /home/heat-admin/')
-        controller_node.run_cmd('sudo chmod 777 /home/heat-admin/ml2_conf.ini')
-        controller_node.get_file('/home/heat-admin/ml2_conf.ini', local_ml2_conf_file)
-        config_parser = ConfigParser.RawConfigParser()
-        config_parser.read(local_ml2_conf_file)
-        ip,port = re.search( r'[0-9]+(?:\.[0-9]+){3}\:[0-9]+', config_parser.get('ml2_odl','url')).group().split(':')
+        controller_node.run_cmd('sudo cp {0} /home/heat-admin/'
+                                .format(remote_ml2_conf_etc))
+        controller_node.run_cmd('sudo chmod 777 {0}'
+                                .format(remote_ml2_conf_home))
+        controller_node.get_file(remote_ml2_conf_home, local_ml2_conf_file)
+        con_par = ConfigParser.RawConfigParser()
+        con_par.read(local_ml2_conf_file)
+        ip, port = re.search(r'[0-9]+(?:\.[0-9]+){3}\:[0-9]+',
+                             con_par.get('ml2_odl', 'url')).group().split(':')
     elif installer_type == 'fuel':
         local_jetty = os.path.join(os.getcwd(), 'jetty.xml')
         odl_node = next(n for n in nodes if n.is_odl())
@@ -577,12 +582,12 @@ def get_odl_ip_port(nodes,installer_type):
             parsed = xmltodict.parse(fd.read(), dict_constructor=dict)
 
         ip = (parsed['Configure']['Call'][0]['Arg']['New']
-          ['Set'][0]['Property']['@default'])
+              ['Set'][0]['Property']['@default'])
         port = (parsed['Configure']['Call'][0]['Arg']['New']
-            ['Set'][1]['Property']['@default'])
-    else:    
+                ['Set'][1]['Property']['@default'])
+    else:
         raise Exception('Unsupported installer')
-    return ip,port    
+    return ip, port
 
 
 def pluralize(s):
@@ -665,8 +670,9 @@ def delete_classifier_and_acl(tacker_client, clf_name, odl_ip, odl_port):
                    'ietf-access-control-list:ipv4-acl',
                    clf_name)
 
-def fill_installer_dict(installer_type): 
-        default_string = "defaults.installer.{}.".format(installer_type) 
+
+def fill_installer_dict(installer_type):
+        default_string = "defaults.installer.{}.".format(installer_type)
         installer_yaml_fields = {
                              "user": default_string+"user",
                              "password": default_string+"password",

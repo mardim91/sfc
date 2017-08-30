@@ -10,7 +10,6 @@
 
 import os
 import yaml
-import sys
 import sfc
 import functest
 
@@ -28,14 +27,16 @@ class CommonConfig(object):
     Common configuration parameters across testcases
     """
     installer_fields = {}
+
     def __init__(self):
         self.line_length = 30
         self.test_db = ft_utils.get_functest_config("results.test_db_url")
         self.functest_repo_path = os.path.dirname(functest.__file__)
-        self.functest_logging_api = os.path.join(self.functest_repo_path,"ci","logging.ini" )
+        self.functest_logging_api = os.path.join(self.functest_repo_path,
+                                                 "ci", "logging.ini")
         self.sfc_repo_path = os.path.dirname(sfc.__file__)
         self.sfc_test_dir = os.path.join(
-            self.sfc_repo_path,"tests", "functest")
+            self.sfc_repo_path, "tests", "functest")
         self.vnfd_dir = os.path.join(self.sfc_test_dir, "vnfd-templates")
         self.vnfd_default_params_file = os.path.join(
             self.sfc_test_dir, "vnfd-default-params-file")
@@ -45,13 +46,14 @@ class CommonConfig(object):
 
         self.installer_type = CONST.__getattribute__('INSTALLER_TYPE')
 
-        self.installer_fields = test_utils.fill_installer_dict(self.installer_type)
+        self.installer_fields = test_utils.fill_installer_dict(
+                self.installer_type)
 
         self.installer_ip = CONST.__getattribute__('INSTALLER_IP')
 
         self.installer_user = ft_utils.get_parameter_from_yaml(
             self.installer_fields['user'], self.config_file)
-        
+
         try:
             self.installer_password = ft_utils.get_parameter_from_yaml(
                 self.installer_fields['password'], self.config_file)
@@ -90,7 +92,6 @@ class CommonConfig(object):
             "general.dir.functest_data")
         self.image_path = os.path.join(
             self.dir_functest_data, self.image_file_name)
-
 
 
 class TestcaseConfig(object):
