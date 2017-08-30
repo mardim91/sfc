@@ -121,13 +121,13 @@ class SfcFunctest(testcase.OSGCTestCase):
         nodes = (deploymentHandler.get_nodes({'cluster': cluster})
                  if cluster is not None
                  else deploymentHandler.get_nodes())
-        
+
         self.__disable_heat_resource_finder_cache(nodes,
                                                   COMMON_CONFIG.installer_type)
-        
-        if COMMON_CONFIG.installer_type == 'fuel': 
+
+        if COMMON_CONFIG.installer_type == 'fuel':
             a_controller = [node for node in nodes
-                        if node.is_controller()][0]
+                            if node.is_controller()][0]
 
             rc_file = self.__fetch_tackerc_file(a_controller)
             os_utils.source_credentials(rc_file)
@@ -136,7 +136,7 @@ class SfcFunctest(testcase.OSGCTestCase):
             logger.info("OS credentials:")
             for var, value in os.environ.items():
                 if var.startswith("OS_"):
-                    logger.info("\t{0}={1}".format(var, value))        
+                    logger.info("\t{0}={1}".format(var, value))
 
         odl_ip, odl_port = sfc_utils.get_odl_ip_port(
             nodes, COMMON_CONFIG.installer_type)
