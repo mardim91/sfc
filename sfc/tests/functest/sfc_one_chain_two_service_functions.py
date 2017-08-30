@@ -12,7 +12,6 @@ import sys
 import threading
 import logging
 
-from logging import config as logging_config
 import functest.utils.openstack_tacker as os_tacker
 import functest.utils.openstack_utils as os_utils
 import opnfv.utils.ovs_logger as ovs_log
@@ -277,5 +276,5 @@ def main():
 
 
 if __name__ == '__main__':
-    logging_config.fileConfig(COMMON_CONFIG.functest_logging_api)
+    logging.config.fileConfig(COMMON_CONFIG.functest_logging_api)
     main()

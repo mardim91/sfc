@@ -26,7 +26,6 @@ class CommonConfig(object):
     """
     Common configuration parameters across testcases
     """
-    installer_fields = {}
 
     def __init__(self):
         self.line_length = 30

@@ -559,35 +559,58 @@ def get_nova_id(tacker_client, resource, vnf_id=None, vnf_name=None):
         return None
 
 
-def get_odl_ip_port(nodes, installer_type):
-    if installer_type == 'apex':
-        remote_ml2_conf_etc = '/etc/neutron/plugins/ml2/ml2_conf.ini'
-        remote_ml2_conf_home = '/home/heat-admin/ml2_conf.ini'
-        local_ml2_conf_file = os.path.join(os.getcwd(), 'ml2_conf.ini')
-        controller_node = next(n for n in nodes if n.is_controller())
-        controller_node.run_cmd('sudo cp {0} /home/heat-admin/'
-                                .format(remote_ml2_conf_etc))
-        controller_node.run_cmd('sudo chmod 777 {0}'
-                                .format(remote_ml2_conf_home))
-        controller_node.get_file(remote_ml2_conf_home, local_ml2_conf_file)
-        con_par = ConfigParser.RawConfigParser()
-        con_par.read(local_ml2_conf_file)
-        ip, port = re.search(r'[0-9]+(?:\.[0-9]+){3}\:[0-9]+',
-                             con_par.get('ml2_odl', 'url')).group().split(':')
-    elif installer_type == 'fuel':
-        local_jetty = os.path.join(os.getcwd(), 'jetty.xml')
-        odl_node = next(n for n in nodes if n.is_odl())
-        odl_node.get_file('/opt/opendaylight/etc/jetty.xml', local_jetty)
-        with open(local_jetty) as fd:
-            parsed = xmltodict.parse(fd.read(), dict_constructor=dict)
+#def get_odl_ip_port(nodes, installer_type):
+#    if installer_type == 'apex':
+#        remote_ml2_conf_etc = '/etc/neutron/plugins/ml2/ml2_conf.ini'
+#        remote_ml2_conf_home = '/home/heat-admin/ml2_conf.ini'
+#        local_ml2_conf_file = os.path.join(os.getcwd(), 'ml2_conf.ini')
+#        controller_node = next(n for n in nodes if n.is_controller())
+#        controller_node.run_cmd('sudo cp {0} /home/heat-admin/'
+#                                .format(remote_ml2_conf_etc))
+#        controller_node.run_cmd('sudo chmod 777 {0}'
+#                                .format(remote_ml2_conf_home))
+#        controller_node.get_file(remote_ml2_conf_home, local_ml2_conf_file)
+#        con_par = ConfigParser.RawConfigParser()
+#        con_par.read(local_ml2_conf_file)
+#        ip, port = re.search(r'[0-9]+(?:\.[0-9]+){3}\:[0-9]+',
+#                             con_par.get('ml2_odl', 'url')).group().split(':')
+#    elif installer_type == 'fuel':
+#        local_jetty = os.path.join(os.getcwd(), 'jetty.xml')
+#        odl_node = next(n for n in nodes if n.is_odl())
+#        odl_node.get_file('/opt/opendaylight/etc/jetty.xml', local_jetty)
+#        with open(local_jetty) as fd:
+#            parsed = xmltodict.parse(fd.read(), dict_constructor=dict)
 
-        ip = (parsed['Configure']['Call'][0]['Arg']['New']
-              ['Set'][0]['Property']['@default'])
-        port = (parsed['Configure']['Call'][0]['Arg']['New']
-                ['Set'][1]['Property']['@default'])
-    else:
-        raise Exception('Unsupported installer')
+#        ip = (parsed['Configure']['Call'][0]['Arg']['New']
+#              ['Set'][0]['Property']['@default'])
+#        port = (parsed['Configure']['Call'][0]['Arg']['New']
+#                ['Set'][1]['Property']['@default'])
+#    else:
+#        raise Exception('Unsupported installer')
+#    return ip, port
+
+
+def get_odl_ip_port(nodes, installer_type):
+    controller_node = next(n for n in nodes if n.is_controller())
+    home_folder = controller_node.run_cmd('pwd')
+    remote_ml2_conf_etc = '/etc/neutron/plugins/ml2/ml2_conf.ini'
+    remote_ml2_conf_home = '{0}/ml2_conf.ini'.format(home_folder)
+    local_ml2_conf_file = os.path.join(os.getcwd(), 'ml2_conf.ini')
+    #controller_node = next(n for n in nodes if n.is_controller())
+    controller_node.run_cmd('sudo cp {0} {1}/'
+                            .format(remote_ml2_conf_etc,home_folder))
+    controller_node.run_cmd('sudo chmod 777 {0}'
+                            .format(remote_ml2_conf_home))
+    controller_node.get_file(remote_ml2_conf_home, local_ml2_conf_file)
+    con_par = ConfigParser.RawConfigParser()
+    con_par.read(local_ml2_conf_file)
+    ip, port = re.search(r'[0-9]+(?:\.[0-9]+){3}\:[0-9]+',
+                         con_par.get('ml2_odl', 'url')).group().split(':')
     return ip, port
+   
+
+
+
 
 
 def pluralize(s):
