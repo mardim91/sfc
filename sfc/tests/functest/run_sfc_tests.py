@@ -34,9 +34,10 @@ class SfcFunctest(testcase.OSGCTestCase):
         remote_heat_conf_etc = '/etc/heat/heat.conf'
         remote_heat_conf_home = '/home/heat-admin/heat.conf'
         local_heat_conf = '/tmp/heat.conf'
-        cmd_restart_heat = ("sudo /bin/systemctl"
-                            "restart"
-                            "openstack-heat-engine.service"
+        cmd_restart_heat = ("sudo"
+                            " /bin/systemctl"
+                            " restart"
+                            " openstack-heat-engine.service"
                             )
         for controller in controllers:
             logger.info("Fetch {0} from controller {1}"
