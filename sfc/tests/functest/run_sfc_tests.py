@@ -138,8 +138,7 @@ class SfcFunctest(testcase.OSGCTestCase):
                 if var.startswith("OS_"):
                     logger.info("\t{0}={1}".format(var, value))
 
-        odl_ip, odl_port = sfc_utils.get_odl_ip_port(
-            nodes, COMMON_CONFIG.installer_type)
+        odl_ip, odl_port = sfc_utils.get_odl_ip_port(nodes)
 
         ovs_logger = ovs_log.OVSLogger(
             os.path.join(COMMON_CONFIG.sfc_test_dir, 'ovs-logs'),

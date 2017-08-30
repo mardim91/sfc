@@ -50,8 +50,7 @@ def main():
     compute_nodes = [node for node in openstack_nodes
                      if node.is_compute()]
 
-    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes,
-                                                  COMMON_CONFIG.installer_type)
+    odl_ip, odl_port = test_utils.get_odl_ip_port(openstack_nodes)
 
     for compute in compute_nodes:
         logger.info("This is a compute: %s" % compute.ip)

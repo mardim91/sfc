@@ -558,7 +558,7 @@ def get_nova_id(tacker_client, resource, vnf_id=None, vnf_name=None):
         return None
 
 
-def get_odl_ip_port(nodes, installer_type):
+def get_odl_ip_port(nodes):
     controller_node = next(n for n in nodes if n.is_controller())
     home_folder = controller_node.run_cmd('pwd')
     remote_ml2_conf_etc = '/etc/neutron/plugins/ml2/ml2_conf.ini'
