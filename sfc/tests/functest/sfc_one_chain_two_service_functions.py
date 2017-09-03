@@ -157,15 +157,19 @@ def main():
         default_param_file, testTopology[vnfs[1]])
 
     vnf1_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[0])
+    print vnf1_id
     vnf2_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[1])
+    print vnf2_id
     if vnf1_id is None or vnf2_id is None:
         logger.error('ERROR while booting vnfs')
         sys.exit(1)
 
-    vnf1_instance_id = test_utils.get_nova_id(tacker_client, 'vdu1', vnf1_id)
+    vnf1_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf1_id)
+    print vnf1_instance_id
     os_utils.add_secgroup_to_instance(nova_client, vnf1_instance_id, sg_id)
 
-    vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'vdu1', vnf2_id)
+    vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf2_id)
+    print vnf2_instance_id
     os_utils.add_secgroup_to_instance(nova_client, vnf2_instance_id, sg_id)
 
     os_tacker.create_sfc(tacker_client, 'red',

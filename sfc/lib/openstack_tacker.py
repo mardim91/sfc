@@ -41,6 +41,8 @@ def get_id_from_name(tacker_client, resource_type, resource_name):
 def get_vnfd_id(tacker_client, vnfd_name):
     return get_id_from_name(tacker_client, 'vnfd', vnfd_name)
 
+def get_vim_id(tacker_client,vim_name):
+    return get_id_from_name(tacker_client, 'vim', vim_name)
 
 def get_vnf_id(tacker_client, vnf_name, timeout=5):
     vnf_id = None
@@ -125,6 +127,7 @@ def create_vnf(tacker_client, vnf_name, vnfd_id=None,
             if vnfd_name is None:
                 raise Exception('vnfd id or vnfd name is required')
             vnf_body['vnf']['vnfd_id'] = get_vnfd_id(tacker_client, vnfd_name)
+        vnf_body['vnf']['vim_id'] = get_vim_id(tacker_client, 'test-vim')
         return tacker_client.create_vnf(body=vnf_body)
     except Exception, e:
         logger.error("error [create_vnf(tacker_client,"
@@ -152,7 +155,7 @@ def get_vnf(tacker_client, vnf_id=None, vnf_name=None):
         return None
 
 
-def wait_for_vnf(tacker_client, vnf_id=None, vnf_name=None, timeout=60):
+def wait_for_vnf(tacker_client, vnf_id=None, vnf_name=None, timeout=80):
     try:
         vnf = get_vnf(tacker_client, vnf_id, vnf_name)
         if vnf is None:

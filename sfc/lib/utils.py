@@ -20,7 +20,7 @@ import logging
 from functest.utils.constants import CONST
 import functest.utils.functest_utils as ft_utils
 import functest.utils.openstack_utils as os_utils
-import functest.utils.openstack_tacker as os_tacker
+import sfc.lib.openstack_tacker as os_tacker
 
 
 logger = logging.getLogger(__name__)
@@ -92,7 +92,6 @@ def create_vnf_in_av_zone(
                }
         with open(param_file, 'w+') as f:
             json.dump(data, f)
-
     os_tacker.create_vnf(tacker_client,
                          vnf_name,
                          vnfd_name=vnfd_name,
