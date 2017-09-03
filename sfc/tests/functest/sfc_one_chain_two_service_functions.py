@@ -104,7 +104,8 @@ def main():
 
     vnfs = ['testVNF1', 'testVNF2']
 
-    topo_seed = topo_shuffler.get_seed()
+    #topo_seed = topo_shuffler.get_seed()
+    topo_seed = 1 
     testTopology = topo_shuffler.topology(vnfs, seed=topo_seed)
 
     logger.info('This test is run with the topology {0}'
@@ -113,20 +114,20 @@ def main():
                 .format(testTopology['description']))
 
     #client_instance = test_utils.create_instance(
-        #nova_client, CLIENT, COMMON_CONFIG.flavor, image_id,
-        #network_id, sg_id, av_zone=testTopology['client'])
+    #    nova_client, CLIENT, COMMON_CONFIG.flavor, image_id,
+    #    network_id, sg_id, av_zone=testTopology['client'])
 
     #server_instance = test_utils.create_instance(
-        #nova_client, SERVER, COMMON_CONFIG.flavor, image_id,
-        #network_id, sg_id, av_zone=testTopology['server'])
+    #    nova_client, SERVER, COMMON_CONFIG.flavor, image_id,
+    #    network_id, sg_id, av_zone=testTopology['server'])
 
     #client_ip = client_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
     #logger.info("Client instance received private ip [{}]".format(client_ip))
     #server_ip = server_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
     #logger.info("Server instance received private ip [{}]".format(server_ip))
     
-    test_utils.create_tacker_vim_file(vim_file=COMMON_CONFIG.vim_file)
-    os_tacker.create_vim(tacker_client,vim_file=COMMON_CONFIG.vim_file)
+    #test_utils.create_tacker_vim_file(vim_file=COMMON_CONFIG.vim_file)
+    #os_tacker.create_vim(tacker_client,vim_file=COMMON_CONFIG.vim_file)
 
     #tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
     #                          COMMON_CONFIG.vnfd_dir,

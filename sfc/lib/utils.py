@@ -86,18 +86,12 @@ def create_vnf_in_av_zone(
     if av_zone is not None or av_zone != 'nova':
         param_file = os.path.join(
             '/tmp',
-            'param_{0}.yaml'.format(av_zone.replace('::', '_')))
+            'param_{0}.json'.format(av_zone.replace('::', '_')))
         data = {
-            'vdus': {
-                'vdu1': {
-                    'param': {
-                        'zone': av_zone
-                    }
-                }
-            }
-        }
+               'zone': av_zone
+               }
         with open(param_file, 'w+') as f:
-            yaml.dump(data, f, default_flow_style=False)
+            json.dump(data, f)
 
     os_tacker.create_vnf(tacker_client,
                          vnf_name,
