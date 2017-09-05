@@ -2,6 +2,7 @@ import logging
 import os
 import time
 import json
+import yaml
 
 from tackerclient.tacker import client as tackerclient
 from functest.utils import openstack_utils as os_utils
@@ -54,6 +55,9 @@ def get_vnf_id(tacker_client, vnf_name, timeout=5):
             time.sleep(1)
             timeout -= 1
     return vnf_id
+
+def get_vnffgd_id(tacker_client, vnffgd_name):
+    return get_id_from_name(tacker_client, 'vnffgd', vnffgd_name)
 
 
 def list_vnfds(tacker_client, verbose=False):
@@ -155,7 +159,7 @@ def get_vnf(tacker_client, vnf_id=None, vnf_name=None):
         return None
 
 
-def wait_for_vnf(tacker_client, vnf_id=None, vnf_name=None, timeout=80):
+def wait_for_vnf(tacker_client, vnf_id=None, vnf_name=None, timeout=100):
     try:
         vnf = get_vnf(tacker_client, vnf_id, vnf_name)
         if vnf is None:
@@ -205,5 +209,45 @@ def create_vim(tacker_client,vim_file=None):
     except Exception, e:
         logger.error("Error [create_vim(tacker_client, '%s')]: %s"
                      % (vim_file, e))
+        return None
+
+def create_vnffgd(tacker_client, tosca_file=None, vnffgd_name=None):
+    try:
+        vnffgd_body = {}
+        if tosca_file is not None:
+            with open(tosca_file) as tosca_fd:
+                vnffgd_body = yaml.load(tosca_fd)
+            logger.info('VNFFGD template:\n{0}'.format(vnffgd_body))
+        return tacker_client.create_vnffgd(
+            body={'vnffgd': {'name': vnffgd_name ,'template': {'vnffgd':vnffgd_body}}})
+    except Exception, e:
+        logger.error("Error [create_vnffgd(tacker_client, '%s')]: %s"
+                     % (tosca_file, e))
+        return None
+
+def create_vnffg(tacker_client, vnffg_name=None, vnffgd_id=None,
+               vnffgd_name=None):
+    ''' 
+      Tacker doesn't support Symmetrical chain and parameter file
+      in Openstack/Ocata
+    '''
+    try:
+        vnffg_body = {
+            'vnffg': {
+                'attributes': {},
+                'name': vnffg_name
+            }
+        }
+        if vnffgd_id is not None:
+            vnffg_body['vnffg']['vnffgd_id'] = vnffgd_id
+        else:
+            if vnffgd_name is None:
+                raise Exception('vnffgd id or vnffgd name is required')
+            vnffg_body['vnffg']['vnffgd_id'] = get_vnffgd_id(tacker_client, vnffgd_name)
+        return tacker_client.create_vnffg(body=vnffg_body)
+    except Exception, e:
+        logger.error("error [create_vnffg(tacker_client,"
+                     " '%s', '%s', '%s')]: %s"
+                     % (vnffg_name, vnffgd_id, vnffgd_name, e))
         return None
 

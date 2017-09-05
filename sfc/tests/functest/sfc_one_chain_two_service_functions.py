@@ -86,21 +86,21 @@ def main():
         os.path.join(COMMON_CONFIG.sfc_test_dir, 'ovs-logs'),
         COMMON_CONFIG.functest_results_dir)
 
-    image_id = os_utils.create_glance_image(glance_client,
-                                            COMMON_CONFIG.image_name,
-                                            COMMON_CONFIG.image_path,
-                                            COMMON_CONFIG.image_format,
-                                            public='public')
+    #image_id = os_utils.create_glance_image(glance_client,
+    #                                        COMMON_CONFIG.image_name,
+    #                                        COMMON_CONFIG.image_path,
+    #                                        COMMON_CONFIG.image_format,
+    #                                        public='public')
 
-    network_id = test_utils.setup_neutron(neutron_client,
-                                          TESTCASE_CONFIG.net_name,
-                                          TESTCASE_CONFIG.subnet_name,
-                                          TESTCASE_CONFIG.router_name,
-                                          TESTCASE_CONFIG.subnet_cidr)
+    #network_id = test_utils.setup_neutron(neutron_client,
+    #                                      TESTCASE_CONFIG.net_name,
+    #                                      TESTCASE_CONFIG.subnet_name,
+    #                                      TESTCASE_CONFIG.router_name,
+    #                                      TESTCASE_CONFIG.subnet_cidr)
 
-    sg_id = test_utils.create_security_groups(neutron_client,
-                                              TESTCASE_CONFIG.secgroup_name,
-                                              TESTCASE_CONFIG.secgroup_descr)
+    #sg_id = test_utils.create_security_groups(neutron_client,
+    #                                          TESTCASE_CONFIG.secgroup_name,
+    #                                          TESTCASE_CONFIG.secgroup_descr)
 
     vnfs = ['testVNF1', 'testVNF2']
 
@@ -129,17 +129,17 @@ def main():
     #test_utils.create_tacker_vim_file(vim_file=COMMON_CONFIG.vim_file)
     #os_tacker.create_vim(tacker_client,vim_file=COMMON_CONFIG.vim_file)
 
-    #tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
-    #                          COMMON_CONFIG.vnfd_dir,
-    #                          TESTCASE_CONFIG.test_vnfd_red)
+    tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
+                              COMMON_CONFIG.vnfd_dir,
+                              TESTCASE_CONFIG.test_vnfd_red)
 
     #os_tacker.create_vnfd(
     #    tacker_client,
     #    tosca_file=tosca_file, vnfd_name='test-vnfd1')
 
-    #tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
-    #                          COMMON_CONFIG.vnfd_dir,
-    #                          TESTCASE_CONFIG.test_vnfd_blue)
+    tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
+                              COMMON_CONFIG.vnfd_dir,
+                              TESTCASE_CONFIG.test_vnfd_blue)
     #os_tacker.create_vnfd(
     #    tacker_client,
     #    tosca_file=tosca_file, vnfd_name='test-vnfd2')
@@ -149,42 +149,52 @@ def main():
         COMMON_CONFIG.vnfd_dir,
         COMMON_CONFIG.vnfd_default_params_file)
 
-    test_utils.create_vnf_in_av_zone(
-        tacker_client, vnfs[0], 'test-vnfd1',
-        default_param_file, testTopology[vnfs[0]])
-    test_utils.create_vnf_in_av_zone(
-        tacker_client, vnfs[1], 'test-vnfd2',
-        default_param_file, testTopology[vnfs[1]])
+    #test_utils.create_vnf_in_av_zone(
+    #    tacker_client, vnfs[0], 'test-vnfd1',
+    #    default_param_file, testTopology[vnfs[0]])
+    #test_utils.create_vnf_in_av_zone(
+    #    tacker_client, vnfs[1], 'test-vnfd2',
+    #    default_param_file, testTopology[vnfs[1]])
 
-    vnf1_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[0])
-    print vnf1_id
-    vnf2_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[1])
-    print vnf2_id
-    if vnf1_id is None or vnf2_id is None:
-        logger.error('ERROR while booting vnfs')
-        sys.exit(1)
+    #vnf1_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[0])
+    #print vnf1_id
+    #vnf2_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[1])
+    #print vnf2_id
+    #if vnf1_id is None or vnf2_id is None:
+    #    logger.error('ERROR while booting vnfs')
+    #    sys.exit(1)
 
-    vnf1_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf1_id)
-    print vnf1_instance_id
-    os_utils.add_secgroup_to_instance(nova_client, vnf1_instance_id, sg_id)
+    #vnf1_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf1_id)
+    #print vnf1_instance_id
+    #os_utils.add_secgroup_to_instance(nova_client, vnf1_instance_id, sg_id)
 
-    vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf2_id)
-    print vnf2_instance_id
-    os_utils.add_secgroup_to_instance(nova_client, vnf2_instance_id, sg_id)
+    #vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf2_id)
+    #print vnf2_instance_id
+    #pame = os_utils.add_secgroup_to_instance(nova_client, vnf2_instance_id, sg_id)
+    #print 'einai: '+ str(pame)
+    
 
-    os_tacker.create_sfc(tacker_client, 'red',
-                         chain_vnf_names=[vnfs[0], vnfs[1]])
+    #os_tacker.create_sfc(tacker_client, 'red',
+    #                     chain_vnf_names=[vnfs[0], vnfs[1]])
 
-    os_tacker.create_sfc_classifier(
-        tacker_client, 'red_http', sfc_name='red',
-        match={
-            'source_port': 0,
-            'dest_port': 80,
-            'protocol': 6
-        })
+    tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
+                              COMMON_CONFIG.vnffgd_dir,
+                              TESTCASE_CONFIG.test_vnffgd_red)
 
-    logger.info(test_utils.run_cmd('tacker sfc-list')[1])
-    logger.info(test_utils.run_cmd('tacker sfc-classifier-list')[1])
+    os_tacker.create_vnffgd(tacker_client,tosca_file=tosca_file,vnffgd_name='red')
+
+    os_tacker.create_vnffg(tacker_client, vnffgd_name= 'red', vnffg_name='red_http')
+
+    #os_tacker.create_sfc_classifier(
+    #    tacker_client, 'red_http', sfc_name='red',
+    #    match={
+    #        'source_port': 0,
+    #        'dest_port': 80,
+    #        'protocol': 6
+    #    })
+
+    #logger.info(test_utils.run_cmd('tacker sfc-list')[1])
+    #logger.info(test_utils.run_cmd('tacker sfc-classifier-list')[1])
 
     # Start measuring the time it takes to implement the classification rules
     t1 = threading.Thread(target=test_utils.wait_for_classification_rules,
