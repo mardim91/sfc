@@ -56,6 +56,19 @@ def get_vnf_id(tacker_client, vnf_name, timeout=5):
             timeout -= 1
     return vnf_id
 
+
+def get_vnffg_id(tacker_client, vnffg_name, timeout=5):
+    vnffg_id = None
+    while vnffg_id is None and timeout >= 0:
+        vnffg_id = get_id_from_name(tacker_client, 'vnffg', vnffg_name)
+        if vnffg_id is None:
+            logger.info("Could not retrieve ID for vnffg with name [%s]."
+                        " Retrying." % vnffg_name)
+            time.sleep(1)
+            timeout -= 1
+    return vnffg_id
+
+
 def get_vnffgd_id(tacker_client, vnffgd_name):
     return get_id_from_name(tacker_client, 'vnffgd', vnffgd_name)
 
@@ -249,5 +262,52 @@ def create_vnffg(tacker_client, vnffg_name=None, vnffgd_id=None,
         logger.error("error [create_vnffg(tacker_client,"
                      " '%s', '%s', '%s')]: %s"
                      % (vnffg_name, vnffgd_id, vnffgd_name, e))
+        return None
+
+
+def list_vnffgds(tacker_client, verbose=False):
+    try:
+        vnffgds = tacker_client.list_vnffgds(retrieve_all=True)
+        if not verbose:
+            vnffgds = [vnffgd['id'] for vnffgd in vnffgds['vnffgds']]
+        return vnffgds
+    except Exception, e:
+        logger.error("Error [list_vnffgds(tacker_client)]: %s" % e)
+        return None
+
+def list_vnffgs(tacker_client, verbose=False):
+    try:
+        vnffgs = tacker_client.list_vnffgs(retrieve_all=True)
+        if not verbose:
+            vnffgs = [vnffg['id'] for vnffg in vnffgs['vnffgs']]
+        return vnffgs
+    except Exception, e:
+        logger.error("Error [list_vnffgs(tacker_client)]: %s" % e)
+        return None
+
+def delete_vnffg(tacker_client, vnffg_id=None, vnffg_name=None):
+    try:
+        vnffg = vnffg_id
+        if vnffg is None:
+            if vnffg_name is None:
+                raise Exception('You need to provide a VNFFG id or name')
+            vnffg = get_vnffg_id(tacker_client, vnffg_name)
+        return tacker_client.delete_vnffg(vnffg)
+    except Exception, e:
+        logger.error("Error [delete_vnffg(tacker_client, '%s', '%s')]: %s"
+                     % (vnffg_id, vnffg_name, e))
+        return None
+
+def delete_vnffgd(tacker_client, vnffgd_id=None, vnffgd_name=None):
+    try:
+        vnffgd = vnffgd_id
+        if vnffgd is None:
+            if vnffgd_name is None:
+                raise Exception('You need to provide VNFFGD id or VNFFGD name')
+            vnffgd = get_vnffgd_id(tacker_client, vnffgd_name)
+        return tacker_client.delete_vnffgd(vnffgd)
+    except Exception, e:
+        logger.error("Error [delete_vnffgd(tacker_client, '%s', '%s')]: %s"
+                     % (vnffgd_id, vnffgd_name, e))
         return None
 
