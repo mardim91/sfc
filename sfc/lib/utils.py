@@ -80,7 +80,7 @@ def get_av_zones():
 
 
 def create_vnf_in_av_zone(
-        tacker_client, vnf_name, vnfd_name, default_param_file, av_zone=None):
+        tacker_client, vnf_name, vnfd_name, vim_name, default_param_file, av_zone=None):
     param_file = default_param_file
 
     if av_zone is not None or av_zone != 'nova':
@@ -95,6 +95,7 @@ def create_vnf_in_av_zone(
     os_tacker.create_vnf(tacker_client,
                          vnf_name,
                          vnfd_name=vnfd_name,
+                         vim_name=vim_name,
                          param_file=param_file)
 
 
@@ -634,11 +635,15 @@ def fill_installer_dict(installer_type):
                            }
         return installer_yaml_fields
 
-def create_tacker_vim_file(vim_file=None):
-    with open(vim_file) as f:
-        json_dict = json.load(f)
+def register_vim(tacker_client, vim_file=None):
+    tmp_file='/tmp/register-vim.json'
+    if vim_file is not None:
+        with open(vim_file) as f:
+            json_dict = json.load(f)
     
-    json_dict['vim']['auth_url']= CONST.__getattribute__('OS_AUTH_URL')
-    json_dict['vim']['auth_cred']['password']= CONST.__getattribute__('OS_PASSWORD')
+        json_dict['vim']['auth_url']= CONST.__getattribute__('OS_AUTH_URL')
+        json_dict['vim']['auth_cred']['password']= CONST.__getattribute__('OS_PASSWORD')
 
-    json.dump(json_dict, open(vim_file,'w'))
+        json.dump(json_dict, open(tmp_file,'w'))
+
+    os_tacker.create_vim(tacker_client,vim_file=tmp_file)

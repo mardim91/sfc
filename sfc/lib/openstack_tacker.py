@@ -8,6 +8,7 @@ from tackerclient.tacker import client as tackerclient
 from functest.utils import openstack_utils as os_utils
 
 
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_TACKER_API_VERSION = '1.0'
@@ -125,7 +126,7 @@ def list_vnfs(tacker_client, verbose=False):
 
 
 def create_vnf(tacker_client, vnf_name, vnfd_id=None,
-               vnfd_name=None, param_file=None):
+               vnfd_name=None, vim_id=None, vim_name=None, param_file=None):
     try:
         vnf_body = {
             'vnf': {
@@ -140,11 +141,15 @@ def create_vnf(tacker_client, vnf_name, vnfd_id=None,
             vnf_body['vnf']['attributes']['param_values'] = params
         if vnfd_id is not None:
             vnf_body['vnf']['vnfd_id'] = vnfd_id
+        if  vim_id is not None:
+            vnf_body['vnf']['vim_id'] =vim_id
         else:
             if vnfd_name is None:
                 raise Exception('vnfd id or vnfd name is required')
             vnf_body['vnf']['vnfd_id'] = get_vnfd_id(tacker_client, vnfd_name)
-        vnf_body['vnf']['vim_id'] = get_vim_id(tacker_client, 'test-vim')
+            if vim_name is None:
+                raise Exception('vim id or vim name is required')
+            vnf_body['vnf']['vim_id'] = get_vim_id(tacker_client, vim_name)
         return tacker_client.create_vnf(body=vnf_body)
     except Exception, e:
         logger.error("error [create_vnf(tacker_client,"
@@ -309,5 +314,28 @@ def delete_vnffgd(tacker_client, vnffgd_id=None, vnffgd_name=None):
     except Exception, e:
         logger.error("Error [delete_vnffgd(tacker_client, '%s', '%s')]: %s"
                      % (vnffgd_id, vnffgd_name, e))
+        return None
+
+def list_vims(tacker_client, verbose=False):
+    try:
+        vims = tacker_client.list_vims(retrieve_all=True)
+        if not verbose:
+            vims = [vim['id'] for vim in vims['vims']]
+        return vims
+    except Exception, e:
+        logger.error("Error [list_vims(tacker_client)]: %s" % e)
+        return None
+
+def delete_vim(tacker_client, vim_id=None, vim_name=None):
+    try:
+        vim = vim_id
+        if vim is None:
+            if vim_name is None:
+                raise Exception('You need to provide VIM id or VIM name')
+            vim = get_vim_id(tacker_client, vim_name)
+        return tacker_client.delete_vim(vim)
+    except Exception, e:
+        logger.error("Error [delete_vim(tacker_client, '%s', '%s')]: %s"
+                     % (vim_id, vim_name, e))
         return None
 
