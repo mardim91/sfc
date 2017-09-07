@@ -8,7 +8,6 @@ from tackerclient.tacker import client as tackerclient
 from functest.utils import openstack_utils as os_utils
 
 
-
 logger = logging.getLogger(__name__)
 
 DEFAULT_TACKER_API_VERSION = '1.0'
@@ -43,8 +42,10 @@ def get_id_from_name(tacker_client, resource_type, resource_name):
 def get_vnfd_id(tacker_client, vnfd_name):
     return get_id_from_name(tacker_client, 'vnfd', vnfd_name)
 
-def get_vim_id(tacker_client,vim_name):
+
+def get_vim_id(tacker_client, vim_name):
     return get_id_from_name(tacker_client, 'vim', vim_name)
+
 
 def get_vnf_id(tacker_client, vnf_name, timeout=5):
     vnf_id = None
@@ -93,7 +94,8 @@ def create_vnfd(tacker_client, tosca_file=None, vnfd_name=None):
                 vnfd_body = tosca_fd.read()
             logger.info('VNFD template:\n{0}'.format(vnfd_body))
         return tacker_client.create_vnfd(
-            body={"vnfd": {"attributes": {"vnfd": vnfd_body},"name": vnfd_name}})
+            body={"vnfd": {"attributes": {"vnfd": vnfd_body},
+                  "name": vnfd_name}})
     except Exception, e:
         logger.error("Error [create_vnfd(tacker_client, '%s')]: %s"
                      % (tosca_file, e))
@@ -141,8 +143,8 @@ def create_vnf(tacker_client, vnf_name, vnfd_id=None,
             vnf_body['vnf']['attributes']['param_values'] = params
         if vnfd_id is not None:
             vnf_body['vnf']['vnfd_id'] = vnfd_id
-        if  vim_id is not None:
-            vnf_body['vnf']['vim_id'] =vim_id
+        if vim_id is not None:
+            vnf_body['vnf']['vim_id'] = vim_id
         else:
             if vnfd_name is None:
                 raise Exception('vnfd id or vnfd name is required')
@@ -215,19 +217,20 @@ def delete_vnf(tacker_client, vnf_id=None, vnf_name=None):
                      % (vnf_id, vnf_name, e))
         return None
 
-def create_vim(tacker_client,vim_file=None):
+
+def create_vim(tacker_client, vim_file=None):
     try:
         vim_body = {}
         if vim_file is not None:
             with open(vim_file) as vim_fd:
                 vim_body = json.load(vim_fd)
-            logger.info('VIM template:\n{0}'.format(vim_body))    
-        return tacker_client.create_vim(
-            body= vim_body)
+            logger.info('VIM template:\n{0}'.format(vim_body))
+        return tacker_client.create_vim(body=vim_body)
     except Exception, e:
         logger.error("Error [create_vim(tacker_client, '%s')]: %s"
                      % (vim_file, e))
         return None
+
 
 def create_vnffgd(tacker_client, tosca_file=None, vnffgd_name=None):
     try:
@@ -237,15 +240,17 @@ def create_vnffgd(tacker_client, tosca_file=None, vnffgd_name=None):
                 vnffgd_body = yaml.load(tosca_fd)
             logger.info('VNFFGD template:\n{0}'.format(vnffgd_body))
         return tacker_client.create_vnffgd(
-            body={'vnffgd': {'name': vnffgd_name ,'template': {'vnffgd':vnffgd_body}}})
+            body={'vnffgd': {'name': vnffgd_name,
+                  'template': {'vnffgd': vnffgd_body}}})
     except Exception, e:
         logger.error("Error [create_vnffgd(tacker_client, '%s')]: %s"
                      % (tosca_file, e))
         return None
 
+
 def create_vnffg(tacker_client, vnffg_name=None, vnffgd_id=None,
-               vnffgd_name=None):
-    ''' 
+                 vnffgd_name=None):
+    '''
       Tacker doesn't support Symmetrical chain and parameter file
       in Openstack/Ocata
     '''
@@ -261,7 +266,8 @@ def create_vnffg(tacker_client, vnffg_name=None, vnffgd_id=None,
         else:
             if vnffgd_name is None:
                 raise Exception('vnffgd id or vnffgd name is required')
-            vnffg_body['vnffg']['vnffgd_id'] = get_vnffgd_id(tacker_client, vnffgd_name)
+            vnffg_body['vnffg']['vnffgd_id'] = get_vnffgd_id(tacker_client,
+                                                             vnffgd_name)
         return tacker_client.create_vnffg(body=vnffg_body)
     except Exception, e:
         logger.error("error [create_vnffg(tacker_client,"
@@ -280,6 +286,7 @@ def list_vnffgds(tacker_client, verbose=False):
         logger.error("Error [list_vnffgds(tacker_client)]: %s" % e)
         return None
 
+
 def list_vnffgs(tacker_client, verbose=False):
     try:
         vnffgs = tacker_client.list_vnffgs(retrieve_all=True)
@@ -289,6 +296,7 @@ def list_vnffgs(tacker_client, verbose=False):
     except Exception, e:
         logger.error("Error [list_vnffgs(tacker_client)]: %s" % e)
         return None
+
 
 def delete_vnffg(tacker_client, vnffg_id=None, vnffg_name=None):
     try:
@@ -303,6 +311,7 @@ def delete_vnffg(tacker_client, vnffg_id=None, vnffg_name=None):
                      % (vnffg_id, vnffg_name, e))
         return None
 
+
 def delete_vnffgd(tacker_client, vnffgd_id=None, vnffgd_name=None):
     try:
         vnffgd = vnffgd_id
@@ -316,6 +325,7 @@ def delete_vnffgd(tacker_client, vnffgd_id=None, vnffgd_name=None):
                      % (vnffgd_id, vnffgd_name, e))
         return None
 
+
 def list_vims(tacker_client, verbose=False):
     try:
         vims = tacker_client.list_vims(retrieve_all=True)
@@ -325,6 +335,7 @@ def list_vims(tacker_client, verbose=False):
     except Exception, e:
         logger.error("Error [list_vims(tacker_client)]: %s" % e)
         return None
+
 
 def delete_vim(tacker_client, vim_id=None, vim_name=None):
     try:
@@ -338,4 +349,3 @@ def delete_vim(tacker_client, vim_id=None, vim_name=None):
         logger.error("Error [delete_vim(tacker_client, '%s', '%s')]: %s"
                      % (vim_id, vim_name, e))
         return None
-

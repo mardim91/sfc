@@ -53,6 +53,7 @@ def delete_vnffgs():
         logger.info("Removing vnffg: {0}".format(vnffg))
         os_tacker.delete_vnffg(t, vnffg_id=vnffg)
 
+
 def delete_vnffgds():
     t = os_tacker.get_tacker_client()
     vnffgds = os_tacker.list_vnffgds(t)
@@ -71,7 +72,6 @@ def delete_vims():
     for vim in vims:
         logger.info("Removing vim: {0}".format(vim))
         os_tacker.delete_vim(t, vim_id=vim)
-
 
 
 def delete_floating_ips():

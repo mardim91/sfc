@@ -124,8 +124,8 @@ def main():
     logger.info("Client instance received private ip [{}]".format(client_ip))
     server_ip = server_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
     logger.info("Server instance received private ip [{}]".format(server_ip))
-    
-    test_utils.register_vim(tacker_client,vim_file=COMMON_CONFIG.vim_file)
+
+    test_utils.register_vim(tacker_client, vim_file=COMMON_CONFIG.vim_file)
 
     tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
                               COMMON_CONFIG.vnfd_dir,
@@ -148,10 +148,10 @@ def main():
         COMMON_CONFIG.vnfd_default_params_file)
 
     test_utils.create_vnf_in_av_zone(
-        tacker_client, vnfs[0], 'test-vnfd1','test-vim',
+        tacker_client, vnfs[0], 'test-vnfd1', 'test-vim',
         default_param_file, testTopology[vnfs[0]])
     test_utils.create_vnf_in_av_zone(
-        tacker_client, vnfs[1], 'test-vnfd2','test-vim',
+        tacker_client, vnfs[1], 'test-vnfd2', 'test-vim',
         default_param_file, testTopology[vnfs[1]])
 
     vnf1_id = os_tacker.wait_for_vnf(tacker_client, vnf_name=vnfs[0])
@@ -165,15 +165,18 @@ def main():
 
     vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf2_id)
     os_utils.add_secgroup_to_instance(nova_client, vnf2_instance_id, sg_id)
-    
 
     tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
                               COMMON_CONFIG.vnffgd_dir,
                               TESTCASE_CONFIG.test_vnffgd_red)
 
-    os_tacker.create_vnffgd(tacker_client,tosca_file=tosca_file,vnffgd_name='red')
+    os_tacker.create_vnffgd(tacker_client,
+                            tosca_file=tosca_file,
+                            vnffgd_name='red')
 
-    os_tacker.create_vnffg(tacker_client, vnffgd_name= 'red', vnffg_name='red_http')
+    os_tacker.create_vnffg(tacker_client,
+                           vnffgd_name='red',
+                           vnffg_name='red_http')
 
     # Start measuring the time it takes to implement the classification rules
     t1 = threading.Thread(target=test_utils.wait_for_classification_rules,
