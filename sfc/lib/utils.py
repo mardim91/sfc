@@ -14,6 +14,7 @@ import subprocess
 import requests
 import time
 import json
+import yaml
 
 import logging
 from functest.utils.constants import CONST
@@ -653,3 +654,32 @@ def register_vim(tacker_client, vim_file=None):
         json.dump(json_dict, open(tmp_file, 'w'))
 
     os_tacker.create_vim(tacker_client, vim_file=tmp_file)
+
+def create_vnffgd_with_src_ip_classifier(tacker_client,
+                                         tosca_file=None,
+                                         vnffgd_name=None,
+                                         src_ip=None):
+
+    if tosca_file is not None:
+        tmp_tosca_file = os.path.join(
+            '/tmp',
+            'test2_{0}.yaml'.format(vnffgd_name))
+        with open(tosca_file) as fd:
+             tosca_dict = yaml.load(fd)
+             tosca_dict = add_ip_to_ip_src_prefix_key(tosca_dict, src_ip)
+             yaml.dump(tosca_dict, open(tmp_tosca_file, 'w+'), default_flow_style=False)
+
+    os_tacker.create_vnffgd(tacker_client,
+                            tosca_file=tmp_tosca_file,
+                            vnffgd_name=vnffgd_name)
+
+
+def add_ip_to_ip_src_prefix_key(tosca_dict, src_ip):
+    if 'criteria' in tosca_dict:
+        tosca_dict['criteria'][1]['ip_src_prefix'] = '{0}/24'.format(src_ip)
+    else:
+        for k, v in tosca_dict.iteritems():
+            if isinstance(v, dict):
+                add_ip_to_ip_src_prefix_key(v, src_ip)
+    return tosca_dict
+

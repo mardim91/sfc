@@ -115,7 +115,8 @@ def main():
 
     vnf_names = ['testVNF1', 'testVNF2']
 
-    topo_seed = topo_shuffler.get_seed()  # change to None for nova av zone
+    #topo_seed = topo_shuffler.get_seed()  # change to None for nova av zone
+    topo_seed = 1
     testTopology = topo_shuffler.topology(vnf_names, seed=topo_seed)
 
     logger.info('This test is run with the topology {0}'
@@ -130,6 +131,9 @@ def main():
     server_instance = test_utils.create_instance(
         nova_client, SERVER, COMMON_CONFIG.flavor, image_id,
         network_id, sg_id, av_zone=testTopology['server'])
+
+    client_ip = client_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
+    print 'the ip '+ str(client_ip)
 
     server_ip = server_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
 
@@ -173,14 +177,21 @@ def main():
 
     vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf2_id)
     os_utils.add_secgroup_to_instance(nova_client, vnf2_instance_id, sg_id)
+    
+    sys.exit(1)
 
     tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
                               COMMON_CONFIG.vnffgd_dir,
                               TESTCASE_CONFIG.test_vnffgd_red)
 
-    os_tacker.create_vnffgd(tacker_client,
-                            tosca_file=tosca_file,
-                            vnffgd_name='red')
+
+    test_utils.create_vnffgd_with_src_ip_classifier(tacker_client,
+                                                    tosca_file=tosca_file,
+                                                    vnffgd_name='red',
+                                                    src_ip=client_ip)
+    #os_tacker.create_vnffgd(tacker_client,
+    #                        tosca_file=tosca_file,
+    #                        vnffgd_name='red')
 
     os_tacker.create_vnffg(tacker_client,
                            vnffgd_name='red',
@@ -308,5 +319,5 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.config.fileConfig(COMMON_CONFIG.functest_logging_api)
+    #logging.config.fileConfig(COMMON_CONFIG.functest_logging_api)
     main()
