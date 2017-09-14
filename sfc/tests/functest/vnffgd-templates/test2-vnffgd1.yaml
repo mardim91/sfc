@@ -14,7 +14,7 @@ topology_template:
         policy:
           type: ACL
           criteria:
-            - ip_proto: 6
+            - network_src_port_id: 
             - ip_src_prefix: 
         path:
           - forwarder: test-vnfd1
