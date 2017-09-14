@@ -178,24 +178,39 @@ def main():
     vnf2_instance_id = test_utils.get_nova_id(tacker_client, 'VDU1', vnf2_id)
     os_utils.add_secgroup_to_instance(nova_client, vnf2_instance_id, sg_id)
     
-    sys.exit(1)
-
+    
     tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
                               COMMON_CONFIG.vnffgd_dir,
                               TESTCASE_CONFIG.test_vnffgd_red)
 
 
-    test_utils.create_vnffgd_with_src_ip_classifier(tacker_client,
-                                                    tosca_file=tosca_file,
-                                                    vnffgd_name='red',
-                                                    src_ip=client_ip)
-    #os_tacker.create_vnffgd(tacker_client,
-    #                        tosca_file=tosca_file,
-    #                        vnffgd_name='red')
+    test_utils.create_vnffgd_src_ip_port_id_clr(tacker_client,
+                                                tosca_file=tosca_file,
+                                                vnffgd_name='red',
+                                                src_ip=client_ip_red)
+
+    tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
+                              COMMON_CONFIG.vnffgd_dir,
+                              TESTCASE_CONFIG.test_vnffgd_blue)
+
+
+    #test_utils.create_vnffgd_with_src_ip_classifier(tacker_client,
+    #                                               tosca_file=tosca_file,
+    #                                               vnffgd_name='blue',
+    #                                               src_ip=client_ip_blue)
+
+    os_tacker.create_vnffgd(tacker_client,
+                            tosca_file=tosca_file,
+                            vnffgd_name='blue')
 
     os_tacker.create_vnffg(tacker_client,
                            vnffgd_name='red',
                            vnffg_name='red_http_works')
+
+    os_tacker.create_vnffg(tacker_client,
+                           vnffgd_name='blue',
+                           vnffg_name='blue_ssh_works')
+
 
     # Start measuring the time it takes to implement the classification rules
     t1 = threading.Thread(target=test_utils.wait_for_classification_rules,
@@ -210,15 +225,18 @@ def main():
     logger.info("Assigning floating IPs to instances")
     server_floating_ip = test_utils.assign_floating_ip(
         nova_client, neutron_client, server_instance.id)
-    client_floating_ip = test_utils.assign_floating_ip(
-        nova_client, neutron_client, client_instance.id)
+    client_red_floating_ip = test_utils.assign_floating_ip(
+        nova_client, neutron_client, client_instance_red.id)
+    client_blue_floating_ip = test_utils.assign_floating_ip(
+        nova_client, neutron_client, client_instance_blue.id)
     sf1_floating_ip = test_utils.assign_floating_ip(
         nova_client, neutron_client, vnf1_instance_id)
     sf2_floating_ip = test_utils.assign_floating_ip(
         nova_client, neutron_client, vnf2_instance_id)
 
     for ip in (server_floating_ip,
-               client_floating_ip,
+               client_red_floating_ip,
+               client_blue_floating_ip,
                sf1_floating_ip,
                sf2_floating_ip):
         logger.info("Checking connectivity towards floating IP [%s]" % ip)
@@ -246,7 +264,7 @@ def main():
     t1.join()
 
     logger.info("Test SSH")
-    if test_utils.is_ssh_blocked(client_floating_ip, server_ip):
+    if test_utils.is_ssh_blocked(client_red_floating_ip, server_ip):
         results.add_to_summary(2, "PASS", "SSH Blocked")
     else:
         error = ('\033[91mTEST 1 [FAILED] ==> SSH NOT BLOCKED\033[0m')
@@ -256,7 +274,7 @@ def main():
         results.add_to_summary(2, "FAIL", "SSH Blocked")
 
     logger.info("Test HTTP")
-    if not test_utils.is_http_blocked(client_floating_ip, server_ip):
+    if not test_utils.is_http_blocked(client_red_floating_ip, server_ip):
         results.add_to_summary(2, "PASS", "HTTP works")
     else:
         error = ('\033[91mTEST 2 [FAILED] ==> HTTP BLOCKED\033[0m')
@@ -267,21 +285,21 @@ def main():
 
     logger.info("Changing the classification")
 
-    os_tacker.delete_vnffg(tacker_client, vnffg_name='red_http_works')
+    #os_tacker.delete_vnffg(tacker_client, vnffg_name='red_http_works')
 
-    os_tacker.delete_vnffgd(tacker_client, vnffgd_name='red')
+    #os_tacker.delete_vnffgd(tacker_client, vnffgd_name='red')
 
-    tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
-                              COMMON_CONFIG.vnffgd_dir,
-                              TESTCASE_CONFIG.test_vnffgd_blue)
+    #tosca_file = os.path.join(COMMON_CONFIG.sfc_test_dir,
+    #                          COMMON_CONFIG.vnffgd_dir,
+    #                          TESTCASE_CONFIG.test_vnffgd_blue)
 
-    os_tacker.create_vnffgd(tacker_client,
-                            tosca_file=tosca_file,
-                            vnffgd_name='blue')
+    #os_tacker.create_vnffgd(tacker_client,
+    #                        tosca_file=tosca_file,
+    #                        vnffgd_name='blue')
 
-    os_tacker.create_vnffg(tacker_client,
-                           vnffgd_name='blue',
-                           vnffg_name='blue_ssh_works')
+    #os_tacker.create_vnffg(tacker_client,
+    #                       vnffgd_name='blue',
+    #                       vnffg_name='blue_ssh_works')
 
     # Start measuring the time it takes to implement the classification rules
     t2 = threading.Thread(target=test_utils.wait_for_classification_rules,
@@ -296,7 +314,7 @@ def main():
     t2.join()
 
     logger.info("Test HTTP")
-    if test_utils.is_http_blocked(client_floating_ip, server_ip):
+    if test_utils.is_http_blocked(client_blue_floating_ip, server_ip):
         results.add_to_summary(2, "PASS", "HTTP Blocked")
     else:
         error = ('\033[91mTEST 3 [FAILED] ==> HTTP WORKS\033[0m')
@@ -306,7 +324,7 @@ def main():
         results.add_to_summary(2, "FAIL", "HTTP Blocked")
 
     logger.info("Test SSH")
-    if not test_utils.is_ssh_blocked(client_floating_ip, server_ip):
+    if not test_utils.is_ssh_blocked(client_blue_floating_ip, server_ip):
         results.add_to_summary(2, "PASS", "SSH works")
     else:
         error = ('\033[91mTEST 4 [FAILED] ==> SSH BLOCKED\033[0m')
