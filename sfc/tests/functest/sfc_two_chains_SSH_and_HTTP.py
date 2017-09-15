@@ -133,10 +133,8 @@ def main():
         network_id, sg_id, av_zone=testTopology['server'])
 
     client_ip = client_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
-    print 'the ip '+ str(client_ip)
 
     client_port_id = test_utils.get_port_id(neutron_client,fixed_ip=client_ip)
-    print 'the port'+ str(client_port_id)
 
     server_ip = server_instance.networks.get(TESTCASE_CONFIG.net_name)[0]
 
@@ -237,7 +235,7 @@ def main():
         nova_client, neutron_client, vnf2_instance_id)
 
     for ip in (server_floating_ip,
-               client_red_floating_ip,
+               client_floating_ip,
                sf1_floating_ip,
                sf2_floating_ip):
         logger.info("Checking connectivity towards floating IP [%s]" % ip)
